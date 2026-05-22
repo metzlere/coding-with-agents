@@ -63,12 +63,15 @@ Examples:
 - <Things explicitly excluded, especially adjacent things you might be tempted to add. "Real-time mode," "web UI," "multi-tenancy" if not needed, etc.>
 
 ## Testing approach
-<What's getting tested, what isn't, and why. Decide this upfront so `/implement` doesn't have to ad-hoc it per task. Examples:
-- Unit tests for `src/score.py` — pure functions, easy to assert with synthetic input.
-- Integration test in `tests/test_pipeline.py` — feeds a small sample CSV through the full loader → scorer → writer flow, asserts output shape and a couple of flagged rows.
-- Skipped: `scripts/run.py` entry point — thin glue, covered indirectly by the integration test.
-- Fixtures: small synthetic DataFrames inline in the tests; no real data committed.
-- Framework: pytest.>
+<First, check the repo: what testing patterns and conventions already exist? Framework, file layout, fixture style, typical coverage level. Follow those. If this is a new repo with no existing pattern, propose one here and say why it fits.
+
+Then capture, in plain language, what's getting tested, what isn't, and why. Decide this upfront so `/implement` doesn't have to ad-hoc it per task. Things to cover:
+- Which behaviors get tested, and at what level (unit, integration, end-to-end).
+- What's intentionally skipped, and why (thin glue, covered indirectly, throwaway).
+- Fixture/data strategy (synthetic inline, sample files, real data).
+- Anything that diverges from the repo's existing test conventions, and why.
+
+Don't prescribe specific test file paths or per-module test plans here. Naming and layout follow whatever convention the repo (or proposed new convention) already uses.>
 
 For trivial changes (a config bump, a one-line fix), this section can be a single line or omitted entirely.
 

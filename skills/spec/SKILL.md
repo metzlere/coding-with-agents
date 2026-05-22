@@ -21,7 +21,7 @@ Push back when something doesn't add up — scope drift, contradictions with ear
 
 After the interview, summarize the spec in your own words and confirm before writing. Then write to `docs/specs/<spec-name>/spec.md` (kebab-case). The template at `spec-template.md` in this skill's folder is a menu — use what adds value, omit the rest. Required: **Problem** and **What it does**. Match depth to complexity: a small change is five lines; a full pipeline gets the whole template.
 
-**Testing approach is part of the interview, not an afterthought.** For anything beyond a trivial change, decide upfront what's getting tested, what isn't, and why — unit vs. integration, what fixtures look like, what's intentionally skipped. This prevents the "implement now, figure out tests later" trap that always becomes test-never. Capture the decision in the **Testing approach** section.
+**Testing approach is part of the interview, not an afterthought.** For anything beyond a trivial change, decide upfront what's getting tested, what isn't, and why. Default to whatever testing patterns and conventions already exist in the repo (framework, layout, fixture style); don't reinvent them. For a new repo with no existing pattern, propose one. Stay at the level of *what* and *why*, not "test file X for module Y". This prevents the "implement now, figure out tests later" trap that always becomes test-never. Capture the decision in the **Testing approach** section.
 
 Capture decisions made during the interview (with the *why*) so the implementer doesn't re-litigate them. The interview should resolve unknowns — if you're tempted to write **Open questions**, keep grilling instead.
 

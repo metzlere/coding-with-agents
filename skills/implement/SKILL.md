@@ -42,6 +42,7 @@ Implement only the current task. Do not start adjacent tasks "while you're in th
 
 Tests are mandatory before close-loop. Test-after, not test-first, but non-negotiable for the task to be "done."
 
+- **Follow the repo's existing testing patterns.** Framework, file layout, fixture style, naming: match what's already there. If this is a new repo with no pattern yet, the `spec.md` Testing approach section should have proposed one; use that. Don't introduce a new convention on a whim.
 - **New public behavior gets a test.** New module, new function, new endpoint, new transform — has at least one test exercising it.
 - **Changed behavior gets its tests updated.** If you changed what a function returns or how it behaves, existing tests are now wrong; fix them or add new ones covering the new behavior.
 - **Run the full suite, not just what you touched.** Failures in unrelated tests usually mean your change broke a caller — investigate before continuing.
