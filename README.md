@@ -10,6 +10,8 @@ coding-with-agents/
     ├── spec/                        # interrogate idea → spec.md
     ├── tasks/                       # decompose spec → tasks.md
     ├── implement/                   # pick task → build → close loop (CHANGELOG, docs)
+    ├── ralph/                       # dumb bash loop: run /implement on tasks.md until empty
+    ├── reconcile/                   # review a batch of changes for coherence, fix the drift
     ├── todo/                        # capture ideas/bugs/chores into root TODO.md
     └── doc-audit/                   # scan repo for stale/missing docs, propose + apply fixes
 ```
@@ -34,6 +36,10 @@ idea
   ▼
 repeat /implement until tasks.md is empty
 ```
+
+`/ralph` automates that last step. It's the "Ralph Wiggum" loop, kept dumb on purpose: a bash `while` loop that grabs the next unchecked task from `tasks.md` and runs a fresh `claude -p` process (one `/implement` pass) on it, over and over, until the list is empty. Each iteration is a clean process with no memory; the filesystem (`tasks.md` + `spec.md`) is the only state passed between them. Guards: a max-iterations ceiling and stall detection (an iteration that removes no task line stops the loop). It runs unattended with `--dangerously-skip-permissions`, so it's for when you're comfortable letting it rip.
+
+`/ralph` doesn't check that the independently-built tasks fit together. That's `/reconcile`: run it after a `/ralph` run (or after a bunch of manual `/implement`s) to review the whole batch of changes for integration breakage and spec drift, and fix what's broken. It catches the cross-task divergence that per-task tests miss. Different from `/code-review` (bugs in a diff) and `/simplify` (style cleanup) — `/reconcile` is specifically about the pieces fitting together.
 
 Orphan work (stuff like "let's try this existing thing with different config", "update pandas", "fix this tiny tiny bug") goes through `/todo`, which drops the entry into root `TODO.md`. Those entries get picked up later via `/implement`, same close-loop.
 
