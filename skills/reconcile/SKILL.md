@@ -1,11 +1,11 @@
 ---
 name: reconcile
-description: Slash command `/reconcile`. Reviews a batch of changes built across multiple tasks (a `/ralph` run, or several manual `/implement`s) to make sure the independently-built pieces actually fit together, match the spec, and don't diverge — then fixes what's broken. Catches the cross-task drift that per-task tests and the spec anchor miss. **Do not auto-invoke based on conversational cues** — only run when the user explicitly types `/reconcile`. Runs after `/ralph` or after a run of `/implement`s. Not a bug hunt (that's `/code-review`) or a style pass (that's `/simplify`).
+description: Slash command `/reconcile`. Reviews a batch of changes built across multiple tasks (a `ralph` run, or several manual `/implement`s) to make sure the independently-built pieces actually fit together, match the spec, and don't diverge — then fixes what's broken. Catches the cross-task drift that per-task tests and the spec anchor miss. **Do not auto-invoke based on conversational cues** — only run when the user explicitly types `/reconcile`. Runs after a `ralph` run or after a run of `/implement`s. Not a bug hunt (that's `/code-review`) or a style pass (that's `/simplify`).
 ---
 
 # Reconcile
 
-When tasks get built independently — a `/ralph` loop, or a bunch of `/implement` passes — each one is correct on its own but nothing checks that they fit together. Two tasks can make different-but-both-passing choices in the gaps the spec didn't pin down: a producer and consumer that disagree on a data shape, two slightly different error-handling styles, duplicate implementations of the same helper, dead code left over from a superseded approach. Per-task tests pass, the spec was the anchor, but drift still accumulates.
+When tasks get built independently — a `ralph` loop, or a bunch of `/implement` passes — each one is correct on its own but nothing checks that they fit together. Two tasks can make different-but-both-passing choices in the gaps the spec didn't pin down: a producer and consumer that disagree on a data shape, two slightly different error-handling styles, duplicate implementations of the same helper, dead code left over from a superseded approach. Per-task tests pass, the spec was the anchor, but drift still accumulates.
 
 This skill's job is to look at the whole batch of changes as one thing, find where the pieces don't line up or wandered off the spec, and fix it. **This skill writes code** — unlike `/code-review`, it doesn't just report, it reconciles.
 
