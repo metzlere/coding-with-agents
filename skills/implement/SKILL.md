@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Slash command `/implement`. Invoked deliberately by the user when they're ready to build a single task. Reads the parent `spec.md` for context, builds the code, runs and updates tests, then closes the loop — updates `CHANGELOG.md`, removes the task line from `tasks.md` or root `TODO.md`, and updates `spec.md` / `README.md` / docstrings if the change made them stale. **Do not auto-invoke based on conversational cues** — only run when the user explicitly types `/implement`. Upstream: `/spec` writes the design, `/tasks` decomposes it.
+description: Slash command `/implement`. Invoked deliberately by the user when they're ready to build a single task. Reads the parent `spec.md` for context, builds the code, runs and updates tests, then closes the loop — updates `CHANGELOG.md`, marks the task done in `tasks.md` with a short build summary (files touched + why) so `/reconcile` can trace it (orphan `TODO.md` tasks just get removed), and updates `spec.md` / `README.md` / docstrings if the change made them stale. **Do not auto-invoke based on conversational cues** — only run when the user explicitly types `/implement`. Upstream: `/spec` writes the design, `/tasks` decomposes it.
 ---
 
 # Implement
@@ -72,7 +72,21 @@ This is the part that prevents the recurring doc-drift pain. Before declaring do
 
    Type is `[Feature]`, `[Fix]`, or `[Chore]`. The trailing `[<spec-name>]` tag is included only for spec-scoped tasks; omit for orphan TODO.md tasks. For orphan tasks, the type comes from which section they were in (`## Features` → `[Feature]`, `## Bugs` → `[Fix]`, `## Chores` → `[Chore]`).
 
-6. **Mark the task done** — remove the entire `- [ ] ...` line from `tasks.md` (or `TODO.md` for orphan tasks). Do not leave a `- [x]` checkbox; the line is gone, the changelog has it now.
+6. **Mark the task done.**
+
+   For **spec tasks** (`tasks.md`): don't delete the line. Flip `- [ ]` to `- [x]` and append a short, indented build summary right under it. This is the trail `/reconcile` follows: it segments the flat git diff back into per-task chunks with intent, so reconcile knows which task touched what and why. Keep it lightweight (one line per category, and only the categories that apply):
+
+   ```
+   - [x] Build the data loader
+     - Created: src/loader.py (reads the CSV, returns a DataFrame)
+     - Edited: src/__init__.py (export load_data)
+     - Deleted: src/old_loader.py (superseded)
+     - Assumes/Provides: returns DataFrame[ts, value]; consumed by the detector task
+   ```
+
+   The **Assumes/Provides** line is the one that earns its keep for reconcile: jot the cross-task contract this task leans on or hands off (a data shape, a function signature, a config key). Skip it for self-contained tasks where there's no contract to record.
+
+   For **orphan tasks** (root `TODO.md`): no `[x]` block, no build summary. Just remove the line like before. Reconcile doesn't run on orphan tasks, so there's no trail to leave.
 
    **Also check `TODO.md` for an originating entry.** Specs often grow out of captured TODOs — `TODO.md` is where the user dumps ideas, bugs, and "oh crap I gotta do that" notes, and a spec is frequently the formalization of one of those lines. When the just-finished work fulfills a TODO entry, remove that line too. If the TODO is broader than what was built (only partially addressed), leave it and note progress verbally. Ask if unclear.
 
@@ -82,7 +96,7 @@ Tell the user:
 - What was built (one line)
 - Test results (one line — "3 new tests added, full suite passes")
 - What docs were updated (one line — "spec.md, README.md, CHANGELOG.md updated" or whichever)
-- Where the task was removed from
+- How the task was closed (marked `[x]` with a build summary in `tasks.md`, or removed from `TODO.md` for an orphan task)
 - The CHANGELOG entry that was added
 
 Then stop. Do **not** automatically start the next task. The user picks what to do next — they may want to verify, take a break, or change direction.

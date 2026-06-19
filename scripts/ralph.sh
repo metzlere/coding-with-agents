@@ -3,8 +3,8 @@
 # ralph.sh — the dumb autonomous loop.
 #
 # Pulls the next unchecked task from a tasks.md and runs a fresh `claude -p`
-# process on it (one /implement pass) every iteration, until the list is empty,
-# the max-iterations guard trips, or a task makes no progress. Each iteration is
+# process on it (one /implement pass) every iteration, until no unchecked tasks
+# remain, the max-iterations guard trips, or a task makes no progress. Each iteration is
 # a clean process with zero memory; the filesystem (tasks.md + sibling spec.md)
 # is the only state passed between iterations.
 #
@@ -58,7 +58,7 @@ while grep -qE '^\s*- \[ \]' "$TASKS"; do
   before=$(grep -cE '^\s*- \[ \]' "$TASKS")
   echo "=== Ralph iteration $i — $before task(s) left ===" | tee -a "$LOG"
 
-  claude -p "You are one iteration of a Ralph loop. Read $TASKS and the sibling spec.md in the same folder. Take ONLY the first unchecked task. Invoke the /implement skill and follow it for exactly that one task: build it, write and run tests, then close the loop (update CHANGELOG.md, update any docs the change made stale, and remove that task's line from $TASKS). Do only that one task — nothing else. If you cannot finish it cleanly (missing info, the spec contradicts itself, tests fail and won't fix cleanly), do NOT guess and do NOT remove the line: print 'BLOCKED: <reason>' and stop." \
+  claude -p "You are one iteration of a Ralph loop. Read $TASKS and the sibling spec.md in the same folder. Take ONLY the first unchecked task. Invoke the /implement skill and follow it for exactly that one task: build it, write and run tests, then close the loop (update CHANGELOG.md, update any docs the change made stale, and mark that task done in $TASKS per the skill — flip its '- [ ]' to '- [x]' and append the short build summary under it). Do only that one task — nothing else. If you cannot finish it cleanly (missing info, the spec contradicts itself, tests fail and won't fix cleanly), do NOT guess and do NOT mark it done: leave the '- [ ]' line unchecked, print 'BLOCKED: <reason>' and stop." \
     --dangerously-skip-permissions 2>&1 | tee -a "$LOG"
 
   after=$(grep -cE '^\s*- \[ \]' "$TASKS")

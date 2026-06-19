@@ -18,13 +18,15 @@ Figure out what "the changes" are. Check `git status` and `git log`:
 
 If the scope is ambiguous (long-lived branch, unrelated changes mixed in), ask the user what range to reconcile rather than guessing.
 
+**Read the completed task blocks in `tasks.md`.** `/implement` leaves a `- [x]` block per finished task listing the files it created/edited/deleted (with why) and an Assumes/Provides note. This is your map. The git diff is one flat blob across the whole batch, but the blocks segment it back into per-task chunks with intent, so you know which task touched what and what each one was trying to do. The diff is still ground truth for what actually changed (a task may have touched more than it logged), but the blocks tell you where to look. The **Assumes/Provides** notes are prime drift suspects: if task A says it provides `DataFrame[ts, value]` and task B assumes `[timestamp, val]`, that mismatch is exactly the kind of thing this skill exists to catch.
+
 Then **read the relevant `spec.md`** (or specs). The spec is the intended design — it's what you're checking the cumulative result against. Pay attention to Architecture sketch, Interface, Data shape, and Key decisions.
 
 ## Step 2: Review for coherence
 
 Look across the whole change set for the stuff that only shows up when you see all the tasks together:
 
-- **Integration** — do the pieces actually wire up? Imports resolve. Functions are called with the signatures they're defined with. A module that produces data and a module that consumes it agree on the shape. Things one task assumed another would provide actually exist.
+- **Integration** — do the pieces actually wire up? Imports resolve. Functions are called with the signatures they're defined with. A module that produces data and a module that consumes it agree on the shape. Things one task assumed another would provide actually exist. Cross-check the **Assumes/Provides** notes from each task's block against what the other tasks actually built (and against the code, not just the note, since the note can be stale).
 - **Divergence / inconsistency** — duplicate implementations of the same thing built by different tasks, conflicting patterns for the same job, naming or error-handling style that drifted across tasks, config read two different ways.
 - **Dead ends** — leftover code from an approach a later task superseded, half-wired stubs, TODOs a task left behind.
 - **Spec alignment** — does the cumulative result match `spec.md`'s intent and honor its Key decisions? Flag where the built thing quietly drifted from the design.
